@@ -1,0 +1,149 @@
+{
+  "name": "code-archaeologist",
+  "displayName": "Code Archaeologist",
+  "description": "Right-click any line → understand why it exists. Walks git history, PRs, and commit context to explain the 'why' behind code.",
+  "version": "0.1.0",
+  "publisher": "code-archaeologist",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Other",
+    "AI"
+  ],
+  "keywords": [
+    "git",
+    "blame",
+    "history",
+    "claude",
+    "ai",
+    "onboarding",
+    "code review"
+  ],
+  "activationEvents": [],
+  "main": "./dist/extension.js",
+  "bin": {
+    "code-archaeologist": "./dist/cli.js"
+  },
+  "contributes": {
+    "commands": [
+      {
+        "command": "codeArchaeologist.explainLine",
+        "title": "Code Archaeologist: Explain this line",
+        "category": "Archaeology"
+      },
+      {
+        "command": "codeArchaeologist.explainSelection",
+        "title": "Code Archaeologist: Explain this selection",
+        "category": "Archaeology"
+      },
+      {
+        "command": "codeArchaeologist.explainFunction",
+        "title": "Code Archaeologist: Explain this function's history",
+        "category": "Archaeology"
+      }
+    ],
+    "menus": {
+      "editor/context": [
+        {
+          "command": "codeArchaeologist.explainLine",
+          "when": "editorTextFocus && !editorHasSelection",
+          "group": "1_archaeology@1"
+        },
+        {
+          "command": "codeArchaeologist.explainSelection",
+          "when": "editorTextFocus && editorHasSelection",
+          "group": "1_archaeology@1"
+        }
+      ],
+      "commandPalette": [
+        {
+          "command": "codeArchaeologist.explainLine",
+          "when": "editorTextFocus"
+        },
+        {
+          "command": "codeArchaeologist.explainSelection",
+          "when": "editorTextFocus"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "Code Archaeologist",
+      "properties": {
+        "codeArchaeologist.anthropicApiKey": {
+          "type": "string",
+          "default": "",
+          "markdownDescription": "Your Anthropic API key. Get one at https://console.anthropic.com/. Stored in VSCode secret storage when set via the command palette.",
+          "scope": "application"
+        },
+        "codeArchaeologist.model": {
+          "type": "string",
+          "default": "claude-opus-4-7",
+          "enum": [
+            "claude-opus-4-7",
+            "claude-sonnet-4-6",
+            "claude-haiku-4-5-20251001"
+          ],
+          "markdownDescription": "Claude model. Opus = highest quality, Haiku = fastest/cheapest. Sonnet is a good balance."
+        },
+        "codeArchaeologist.maxCommitsToWalk": {
+          "type": "number",
+          "default": 20,
+          "minimum": 1,
+          "maximum": 100,
+          "markdownDescription": "How many historical commits to walk when tracing a line's origin. More = deeper history but slower + more tokens."
+        },
+        "codeArchaeologist.includeFileHistory": {
+          "type": "boolean",
+          "default": true,
+          "markdownDescription": "Also include the file's overall recent history, not just the line's blame."
+        },
+        "codeArchaeologist.followFileRenames": {
+          "type": "boolean",
+          "default": true,
+          "markdownDescription": "Follow the file through renames when walking history."
+        },
+        "codeArchaeologist.fetchGitHubPRs": {
+          "type": "boolean",
+          "default": true,
+          "markdownDescription": "If the repo is on GitHub, fetch linked PRs for richer context. Uses unauthenticated GitHub API by default (rate-limited to 60/hour). Set a token below for 5000/hour."
+        },
+        "codeArchaeologist.githubToken": {
+          "type": "string",
+          "default": "",
+          "markdownDescription": "Optional GitHub personal access token for higher rate limits and access to private repos. No scopes needed for public repos; `repo` scope for private."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run build",
+    "build": "npm run build:extension && npm run build:cli",
+    "build:extension": "esbuild src/extension/index.ts --bundle --outfile=dist/extension.js --external:vscode --format=cjs --platform=node --minify",
+    "build:cli": "esbuild src/cli/index.ts --bundle --outfile=dist/cli.js --format=cjs --platform=node --banner:js=\"#!/usr/bin/env node\" --minify",
+    "watch": "esbuild src/extension/index.ts --bundle --outfile=dist/extension.js --external:vscode --format=cjs --platform=node --sourcemap --watch",
+    "dev:cli": "tsx src/cli/index.ts",
+    "package": "vsce package",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "lint": "eslint src --ext .ts"
+  },
+  "devDependencies": {
+    "@types/node": "^22.7.0",
+    "@types/vscode": "^1.85.0",
+    "@vscode/vsce": "^3.2.0",
+    "esbuild": "^0.24.0",
+    "tsx": "^4.19.0",
+    "typescript": "^5.6.0",
+    "vitest": "^2.1.0"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.96.0",
+    "zod": "^3.23.8"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/your-username/code-archaeologist"
+  },
+  "license": "MIT"
+}

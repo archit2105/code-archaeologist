@@ -1,0 +1,20 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "type": "npm",
+      "script": "build",
+      "problemMatcher": [],
+      "label": "npm: build",
+      "detail": "Build the extension"
+    },
+    {
+      "type": "npm",
+      "script": "watch",
+      "problemMatcher": [],
+      "label": "npm: watch",
+      "isBackground": true,
+      "detail": "Watch and rebuild the extension"
+    }
+  ]
+}
